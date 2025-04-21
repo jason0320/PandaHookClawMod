@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>Panda's Elonaplus Hook Claw Mod</title>
+  <id>Mod_PandaHookClawMod</id>
+  <author>Now Happy Panda</author>
+  <loadPriority>100</loadPriority>
+  <version>0.23.129</version>
+  <description>
+  Added shield item Hook Claw from Elonaplus
+  Allow multi hits when multi wielding Hook Claws, scale with Martial Arts and Dual Wield skills
+  Premission gotten from zwa73 aka Sosarciel
+  </description>
+</Meta>
