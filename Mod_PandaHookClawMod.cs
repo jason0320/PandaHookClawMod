@@ -43,6 +43,7 @@ public class Mod_PandaHookClawMod : BaseUnityPlugin {
         }
     }
 }
+
 [HarmonyPatch(typeof(Thing))]
 [HarmonyPatch(nameof(Thing.AddAttackEvaluation))]
 class Thing_AddAttackEvaluation_Patch
@@ -69,7 +70,7 @@ class Thing_AddAttackEvaluation_Patch
                 new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(SourceThing.Row), "offense")),
                 new CodeMatch(OpCodes.Ldlen),
                 new CodeMatch(OpCodes.Conv_I4),
-                new CodeMatch(OpCodes.Ldc_I4_2)
+                new CodeMatch(OpCodes.Ldc_I4_0)
             );
 
         if (!matcher.IsValid)
@@ -91,21 +92,27 @@ class Thing_AddAttackEvaluation_Patch
 
 [HarmonyPatch(typeof(CharaBody))]
 [HarmonyPatch(nameof(CharaBody.GetAttackIndex))]
-[HarmonyPatch(new [] { typeof(Thing) })]
-class CharaBody_GetAttackIndex_Patch {
-    public static bool Prefix(CharaBody __instance, Thing t, ref int __result) {
+[HarmonyPatch(new[] { typeof(Thing) })]
+class CharaBody_GetAttackIndex_Patch
+{
+    private static bool Prefix(CharaBody __instance, Thing t, ref int __result)
+    {
         int num = 0;
-        foreach (BodySlot bodySlot in __instance.slots) {
-            if (bodySlot.thing != null && bodySlot.elementId == 35 && bodySlot.thing.source.offense.Length >= 2 && bodySlot.thing.source.category != "shield") {
-                if (bodySlot.thing == t) {
+        foreach (BodySlot bodySlot in __instance.slots)
+        {
+            // Allow all weapons except shields
+            if (bodySlot.thing != null && bodySlot.thing.source.category != "shield")
+            {
+                if (bodySlot.thing == t)
+                {
                     __result = num;
-                    return false; // Skip the original method
+                    return false; // Skip original method
                 }
                 num++;
             }
         }
-        __result = -1;
-        return false; // Skip the original method
+        // If no slots match, run the original method (e.g., for barehanded)
+        return true; // <-- Critical fix: Allow original logic
     }
 }
 
@@ -166,39 +173,36 @@ public static class AttackProcess_Prepare_Patch
 [HarmonyPatch(nameof(ActMelee.Attack))]
 public static class ActMelee_Attack_Patch
 {
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il)
     {
-        var matcher = new CodeMatcher(instructions);
+        var codes = new List<CodeInstruction>(instructions);
+        var matcher = new CodeMatcher(codes, il);
 
-        // Find the loop over BodySlots in the IL (foreach bodySlot in Act.CC.body.slots)
+        // Look for the start of the BodySlot loop (should assign to local var like stloc.s)
         matcher.MatchForward(false,
-            new CodeMatch(OpCodes.Ldsfld, AccessTools.Field(typeof(Act), "CC")),
-            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Chara), "body")),
-            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(CharaBody), "slots")),
-            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<BodySlot>), "GetEnumerator"))
+            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<BodySlot>), "GetEnumerator")));
+
+        if (!matcher.IsValid) return codes;
+
+        matcher.MatchForward(false, new CodeMatch(ci => ci.opcode.Name.StartsWith("stloc")));
+        if (!matcher.IsValid) return codes;
+
+        var slotLocal = (LocalBuilder)matcher.Operand;
+
+        matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")));
+        if (!matcher.IsValid) return codes;
+
+        matcher.MatchBack(false, new CodeMatch(ci => ci.opcode.Name.StartsWith("ldloc")));
+        var labelSkip = il.DefineLabel();
+
+        matcher.Insert(
+            new CodeInstruction(OpCodes.Ldloc, slotLocal),
+            new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")),
+            new CodeInstruction(OpCodes.Brfalse_S, labelSkip)
         );
 
-        if (!matcher.IsValid)
-        {
-            return instructions;
-        }
-
-        // Locate the branch instruction after the loop
-        matcher.MatchForward(false, new CodeMatch(OpCodes.Brfalse));
-        if (!matcher.IsValid)
-        {
-            return instructions;
-        }
-
-        var skipLabel = matcher.Operand;
-
-        // Inject null check for BodySlot.thing before processing the slot
-        matcher.Advance(-10) // Adjust based on actual IL offset
-               .InsertAndAdvance(
-                   new CodeInstruction(OpCodes.Ldloc_2), // Load bodySlot
-                   new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")),
-                   new CodeInstruction(OpCodes.Brfalse, skipLabel) // Skip if null
-               );
+        matcher.Advance(3);
+        matcher.Labels.Add(labelSkip);
 
         return matcher.InstructionEnumeration();
     }
