@@ -45,6 +45,7 @@ public class puddles_elona_oddities : BaseUnityPlugin {
     }
     */
 }
+
 [HarmonyPatch(typeof(Thing))]
 [HarmonyPatch(nameof(Thing.AddAttackEvaluation))]
 class Thing_AddAttackEvaluation_Patch
