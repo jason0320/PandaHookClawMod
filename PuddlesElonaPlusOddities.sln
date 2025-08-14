@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PandaHookClawMod", "PandaHookClawMod.csproj", "{624FA10D-23F0-4606-82BD-E5B43FE353B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "puddles_elona_oddities", "puddles_elona_oddities.csproj", "{624FA10D-23F0-4606-82BD-E5B43FE353B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

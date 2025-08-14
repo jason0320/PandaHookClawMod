@@ -7,8 +7,8 @@
     <ProjectGuid>{624FA10D-23F0-4606-82BD-E5B43FE353B8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mod_PandaHookClawMod</RootNamespace>
-    <AssemblyName>Mod_PandaHookClawMod</AssemblyName>
+    <RootNamespace>puddles_elona_oddities</RootNamespace>
+    <AssemblyName>puddles_elona_oddities</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -88,7 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Mod_PandaHookClawMod.cs" />
+    <Compile Include="puddles_elona_oddities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Item\Thing.xlsx" />

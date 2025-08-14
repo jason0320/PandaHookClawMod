@@ -11,20 +11,21 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using static ContentPopulation;
 
-[BepInPlugin("panda.hookclaw.mod", "Panda's Hook Claw Mod", "1.0.0.0")]
+[BepInPlugin("puddles.elonaoddities.mod", "Elona Plus Oddities", "1.0.0.0")]
 [BepInProcess("Elin.exe")]
-public class Mod_PandaHookClawMod : BaseUnityPlugin {
+public class puddles_elona_oddities : BaseUnityPlugin {
     public static new ManualLogSource Logger;
 
     void Awake() {
         Logger = base.Logger;
-        var harmony = new Harmony("Panda's Hook Claw Mod");
+        var harmony = new Harmony("Elona Plus Oddities");
         harmony.PatchAll();
-        Mod_PandaHookClawMod.Logger.LogInfo("Awake");
+        puddles_elona_oddities.Logger.LogInfo("Awake");
     }
 
+    /*
     public void OnStartCore() {
-        Mod_PandaHookClawMod.Logger.LogInfo("OnStartCore");
+        puddles_elona_oddities.Logger.LogInfo("OnStartCore");
         var dir = Path.GetDirectoryName(Info.Location);
         var excel = dir + "/Item/Thing.xlsx";
         var sources = Core.Instance.sources;
@@ -32,8 +33,8 @@ public class Mod_PandaHookClawMod : BaseUnityPlugin {
     }
 
     void Start(){
-        Mod_PandaHookClawMod.Logger.LogInfo("Start");
-        Mod_PandaHookClawMod.Logger.LogInfo("Try trans to CN");
+        puddles_elona_oddities.Logger.LogInfo("Start");
+        puddles_elona_oddities.Logger.LogInfo("Try trans to CN");
         if(Lang.langCode == Lang.LangCode.CN.ToString()){
             var sources = Core.Instance.sources.things;
             var row = sources.GetRow("hp_hook_claw");
@@ -42,6 +43,7 @@ public class Mod_PandaHookClawMod : BaseUnityPlugin {
             row.detail = "模仿野兽、猛禽、毒虫爪子的装备。本用于爬树，不过因为其攻击可弹开防具，提升格斗威力，所以就用于战斗了。";
         }
     }
+    */
 }
 [HarmonyPatch(typeof(Thing))]
 [HarmonyPatch(nameof(Thing.AddAttackEvaluation))]
@@ -69,7 +71,7 @@ class Thing_AddAttackEvaluation_Patch
                 new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(SourceThing.Row), "offense")),
                 new CodeMatch(OpCodes.Ldlen),
                 new CodeMatch(OpCodes.Conv_I4),
-                new CodeMatch(OpCodes.Ldc_I4_2)
+                new CodeMatch(OpCodes.Ldc_I4_0)
             );
 
         if (!matcher.IsValid)
@@ -91,21 +93,27 @@ class Thing_AddAttackEvaluation_Patch
 
 [HarmonyPatch(typeof(CharaBody))]
 [HarmonyPatch(nameof(CharaBody.GetAttackIndex))]
-[HarmonyPatch(new [] { typeof(Thing) })]
-class CharaBody_GetAttackIndex_Patch {
-    public static bool Prefix(CharaBody __instance, Thing t, ref int __result) {
+[HarmonyPatch(new[] { typeof(Thing) })]
+class CharaBody_GetAttackIndex_Patch
+{
+    private static bool Prefix(CharaBody __instance, Thing t, ref int __result)
+    {
         int num = 0;
-        foreach (BodySlot bodySlot in __instance.slots) {
-            if (bodySlot.thing != null && bodySlot.elementId == 35 && bodySlot.thing.source.offense.Length >= 2 && bodySlot.thing.source.category != "shield") {
-                if (bodySlot.thing == t) {
+        foreach (BodySlot bodySlot in __instance.slots)
+        {
+            // Allow all weapons except shields
+            if (bodySlot.thing != null && bodySlot.thing.source.category != "shield")
+            {
+                if (bodySlot.thing == t)
+                {
                     __result = num;
-                    return false; // Skip the original method
+                    return false; // Skip original method
                 }
                 num++;
             }
         }
-        __result = -1;
-        return false; // Skip the original method
+        // If no slots match, run the original method (e.g., for barehanded)
+        return true; // <-- Critical fix: Allow original logic
     }
 }
 
@@ -166,40 +174,58 @@ public static class AttackProcess_Prepare_Patch
 [HarmonyPatch(nameof(ActMelee.Attack))]
 public static class ActMelee_Attack_Patch
 {
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il)
     {
-        var matcher = new CodeMatcher(instructions);
+        var codes = new List<CodeInstruction>(instructions);
+        var matcher = new CodeMatcher(codes, il);
 
-        // Find the loop over BodySlots in the IL (foreach bodySlot in Act.CC.body.slots)
+        // Look for the start of the BodySlot loop (should assign to local var like stloc.s)
         matcher.MatchForward(false,
-            new CodeMatch(OpCodes.Ldsfld, AccessTools.Field(typeof(Act), "CC")),
-            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(Chara), "body")),
-            new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(CharaBody), "slots")),
-            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<BodySlot>), "GetEnumerator"))
+            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<BodySlot>), "GetEnumerator")));
+
+        if (!matcher.IsValid) return codes;
+
+        matcher.MatchForward(false, new CodeMatch(ci => ci.opcode.Name.StartsWith("stloc")));
+        if (!matcher.IsValid) return codes;
+
+        var slotLocal = (LocalBuilder)matcher.Operand;
+
+        matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")));
+        if (!matcher.IsValid) return codes;
+
+        matcher.MatchBack(false, new CodeMatch(ci => ci.opcode.Name.StartsWith("ldloc")));
+        var labelSkip = il.DefineLabel();
+
+        matcher.Insert(
+            new CodeInstruction(OpCodes.Ldloc, slotLocal),
+            new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")),
+            new CodeInstruction(OpCodes.Brfalse_S, labelSkip)
         );
 
-        if (!matcher.IsValid)
-        {
-            return instructions;
-        }
-
-        // Locate the branch instruction after the loop
-        matcher.MatchForward(false, new CodeMatch(OpCodes.Brfalse));
-        if (!matcher.IsValid)
-        {
-            return instructions;
-        }
-
-        var skipLabel = matcher.Operand;
-
-        // Inject null check for BodySlot.thing before processing the slot
-        matcher.Advance(-10) // Adjust based on actual IL offset
-               .InsertAndAdvance(
-                   new CodeInstruction(OpCodes.Ldloc_2), // Load bodySlot
-                   new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")),
-                   new CodeInstruction(OpCodes.Brfalse, skipLabel) // Skip if null
-               );
+        matcher.Advance(3);
+        matcher.Labels.Add(labelSkip);
 
         return matcher.InstructionEnumeration();
+    }
+}
+
+    [HarmonyPatch(typeof(FoodEffect), "Proc")]
+public static class FoodEffect_Proc_Patch
+{
+    public static void Postfix(Chara c, Thing food, bool consume = true)
+    {
+        if (consume)
+        {
+            // food value
+            int num3 = food.Evalue(10);
+            if (num3 > 20 && c.id == "goose_golden")
+            {
+                Thing thing = ThingGen.Create("plat", -1, -1);
+                thing.SetNum(2 + EClass.rnd(3));
+                Msg.SayRaw(c.Name + " lays " + thing.Name + ".");
+                Msg.Say("dropReward");
+                EClass._zone.AddCard(thing, c.pos);
+            }
+        }
     }
 }
