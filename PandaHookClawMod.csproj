@@ -32,6 +32,61 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\BepInEx\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Core">
+      <HintPath>..\..\BepInEx\BepInEx.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Unity">
+      <HintPath>..\..\BepInEx\BepInEx.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Elin">
+      <HintPath>..\..\Elin\Elin.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugins">
+      <HintPath>..\..\Elin\Plugins.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugins.BaseCore">
+      <HintPath>..\..\Elin\Plugins.BaseCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugins.Sound">
+      <HintPath>..\..\Elin\Plugins.Sound.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugins.UI">
+      <HintPath>..\..\Elin\Plugins.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Reflex">
+      <HintPath>..\..\Elin\Reflex.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Elin\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\Elin\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\Elin\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\Elin\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\Elin\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\Elin\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mod_PandaHookClawMod.cs" />
   </ItemGroup>
@@ -45,85 +100,6 @@
     <Content Include="Texture\hp_hook_claw_bak.png" />
     <Content Include="Texture\hp_hook_claw_bak2.png" />
     <Content Include="Texture\hp_hook_claw_bak4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="C:\Users\User\Documents\BepInEx\0Harmony.dll" />
-    <Analyzer Include="C:\Users\User\Documents\BepInEx\BepInEx.Core.dll" />
-    <Analyzer Include="C:\Users\User\Documents\BepInEx\BepInEx.Unity.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\Elin.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\Plugins.BaseCore.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\Plugins.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\Plugins.Sound.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\Plugins.UI.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\Reflex.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\UnityEngine.AudioModule.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\UnityEngine.CoreModule.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\UnityEngine.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\UnityEngine.TextRenderingModule.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\UnityEngine.UI.dll" />
-    <Analyzer Include="C:\Users\User\Documents\Elin\UnityEngine.UIModule.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="0Harmony, Version=2.10.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\BepInEx\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Core, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\BepInEx\BepInEx.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="BepInEx.Unity, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\BepInEx\BepInEx.Unity.dll</HintPath>
-    </Reference>
-    <Reference Include="Elin, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\Elin.dll</HintPath>
-    </Reference>
-    <Reference Include="Plugins, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\Plugins.dll</HintPath>
-    </Reference>
-    <Reference Include="Plugins.BaseCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\Plugins.BaseCore.dll</HintPath>
-    </Reference>
-    <Reference Include="Plugins.Sound, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\Plugins.Sound.dll</HintPath>
-    </Reference>
-    <Reference Include="Plugins.UI, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\Plugins.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Reflex, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\Reflex.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\UnityEngine.AudioModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\UnityEngine.TextRenderingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\User\Documents\Elin\UnityEngine.UIModule.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
