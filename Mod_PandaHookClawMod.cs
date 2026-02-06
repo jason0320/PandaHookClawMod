@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using static ContentPopulation;
 
@@ -156,7 +155,7 @@ public static class AttackProcess_Prepare_Patch
             __instance.dDim = 5 + (int)Mathf.Sqrt(Mathf.Max(0, __instance.weaponSkill.Value / 3));
             __instance.dMulti = 0.6f + (float)(__instance.weaponSkill.GetParent(__instance.CC).Value / 2 + __instance.weaponSkill.Value / 2 + __instance.CC.Evalue(flag2 ? 304 : 132) / 2) / 50f;
             __instance.dMulti += 0.05f * (float)__instance.CC.Evalue(1400);
-            __instance.toHitBase = EClass.curve(__instance.CC.DEX / 3 + __instance.weaponSkill.GetParent(__instance.CC).Value / 3 + __instance.weaponSkill.Value, 50, 25) + 50;
+            __instance.toHitBase = EClass.curve((long)(__instance.CC.DEX / 3 + __instance.weaponSkill.GetParent(__instance.CC).Value / 3 + __instance.weaponSkill.Value), 50, 25) + 50;
             __instance.toHitFix = __instance.CC.HIT;
             if (__instance.attackStyle == AttackStyle.Shield)
             {
