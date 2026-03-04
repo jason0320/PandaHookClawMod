@@ -11,21 +11,20 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using static ContentPopulation;
 
-[BepInPlugin("puddles.elonaoddities.mod", "Elona Plus Oddities", "1.0.0.0")]
+[BepInPlugin("panda.hookclaw.mod", "Panda's Hook Claw Mod", "1.0.0.0")]
 [BepInProcess("Elin.exe")]
-public class puddles_elona_oddities : BaseUnityPlugin {
+public class Mod_PandaHookClawMod : BaseUnityPlugin {
     public static new ManualLogSource Logger;
 
     void Awake() {
         Logger = base.Logger;
-        var harmony = new Harmony("Elona Plus Oddities");
+        var harmony = new Harmony("Panda's Hook Claw Mod");
         harmony.PatchAll();
-        puddles_elona_oddities.Logger.LogInfo("Awake");
+        Mod_PandaHookClawMod.Logger.LogInfo("Awake");
     }
 
-    /*
     public void OnStartCore() {
-        puddles_elona_oddities.Logger.LogInfo("OnStartCore");
+        Mod_PandaHookClawMod.Logger.LogInfo("OnStartCore");
         var dir = Path.GetDirectoryName(Info.Location);
         var excel = dir + "/Item/Thing.xlsx";
         var sources = Core.Instance.sources;
@@ -33,8 +32,8 @@ public class puddles_elona_oddities : BaseUnityPlugin {
     }
 
     void Start(){
-        puddles_elona_oddities.Logger.LogInfo("Start");
-        puddles_elona_oddities.Logger.LogInfo("Try trans to CN");
+        Mod_PandaHookClawMod.Logger.LogInfo("Start");
+        Mod_PandaHookClawMod.Logger.LogInfo("Try trans to CN");
         if(Lang.langCode == Lang.LangCode.CN.ToString()){
             var sources = Core.Instance.sources.things;
             var row = sources.GetRow("hp_hook_claw");
@@ -43,7 +42,6 @@ public class puddles_elona_oddities : BaseUnityPlugin {
             row.detail = "模仿野兽、猛禽、毒虫爪子的装备。本用于爬树，不过因为其攻击可弹开防具，提升格斗威力，所以就用于战斗了。";
         }
     }
-    */
 }
 
 [HarmonyPatch(typeof(Thing))]
@@ -207,26 +205,5 @@ public static class ActMelee_Attack_Patch
         matcher.Labels.Add(labelSkip);
 
         return matcher.InstructionEnumeration();
-    }
-}
-
-    [HarmonyPatch(typeof(FoodEffect), "Proc")]
-public static class FoodEffect_Proc_Patch
-{
-    public static void Postfix(Chara c, Thing food, bool consume = true)
-    {
-        if (consume)
-        {
-            // food value
-            int num3 = food.Evalue(10);
-            if (num3 > 20 && c.id == "goose_golden")
-            {
-                Thing thing = ThingGen.Create("plat", -1, -1);
-                thing.SetNum(2 + EClass.rnd(3));
-                Msg.SayRaw(c.Name + " lays " + thing.Name + ".");
-                Msg.Say("dropReward");
-                EClass._zone.AddCard(thing, c.pos);
-            }
-        }
     }
 }
