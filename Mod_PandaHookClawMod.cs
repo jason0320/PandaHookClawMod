@@ -170,40 +170,34 @@ public static class AttackProcess_Prepare_Patch
 }
 
 [HarmonyPatch(typeof(ActMelee))]
-[HarmonyPatch(nameof(ActMelee.Attack))]
+[HarmonyPatch("Attack")]
 public static class ActMelee_Attack_Patch
 {
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator il)
     {
-        var codes = new List<CodeInstruction>(instructions);
-        var matcher = new CodeMatcher(codes, il);
-
-        // Look for the start of the BodySlot loop (should assign to local var like stloc.s)
-        matcher.MatchForward(false,
-            new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<BodySlot>), "GetEnumerator")));
-
-        if (!matcher.IsValid) return codes;
-
-        matcher.MatchForward(false, new CodeMatch(ci => ci.opcode.Name.StartsWith("stloc")));
-        if (!matcher.IsValid) return codes;
-
-        var slotLocal = (LocalBuilder)matcher.Operand;
-
-        matcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")));
-        if (!matcher.IsValid) return codes;
-
-        matcher.MatchBack(false, new CodeMatch(ci => ci.opcode.Name.StartsWith("ldloc")));
-        var labelSkip = il.DefineLabel();
-
-        matcher.Insert(
-            new CodeInstruction(OpCodes.Ldloc, slotLocal),
-            new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")),
-            new CodeInstruction(OpCodes.Brfalse_S, labelSkip)
-        );
-
-        matcher.Advance(3);
-        matcher.Labels.Add(labelSkip);
-
-        return matcher.InstructionEnumeration();
+        List<CodeInstruction> list = new List<CodeInstruction>(instructions);
+        CodeMatcher codeMatcher = new CodeMatcher(list, il);
+        codeMatcher.MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(List<BodySlot>), "GetEnumerator")));
+        if (!codeMatcher.IsValid)
+        {
+            return list;
+        }
+        codeMatcher.MatchForward(false, new CodeMatch((CodeInstruction ci) => ci.opcode.Name.StartsWith("stloc")));
+        if (!codeMatcher.IsValid)
+        {
+            return list;
+        }
+        LocalBuilder operand = (LocalBuilder)codeMatcher.Operand;
+        codeMatcher.MatchForward(false, new CodeMatch(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")));
+        if (!codeMatcher.IsValid)
+        {
+            return list;
+        }
+        codeMatcher.MatchBack(false, new CodeMatch((CodeInstruction ci) => ci.opcode.Name.StartsWith("ldloc")));
+        Label label = il.DefineLabel();
+        codeMatcher.Insert(new CodeInstruction(OpCodes.Ldloc, operand), new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(BodySlot), "thing")), new CodeInstruction(OpCodes.Brfalse_S, label));
+        codeMatcher.Advance(3);
+        codeMatcher.Labels.Add(label);
+        return codeMatcher.InstructionEnumeration();
     }
 }
